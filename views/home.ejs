@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Home</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
+  </script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+  </script>
+
+</head>
+
+<body style="background-color:turquoise;">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">Database</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="/">Employee list<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/service">Employee Creat</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="/profile">Profile</a>
+        </li>
+      </ul>
+      <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      </form>
+    </div>
+  </nav>
+  <div class="container bg-white rounded shadow-sm mt-5 p-4">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#list">Employee List</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#edit">Employee data Edit</a>
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane container active" id="list">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Mobile</th>
+              <th>City</th>
+              <th>Edit</th>
+              <th>Delete</th>
+
+            </tr>
+          </thead>
+          <tbody>
+            <% record.forEach(function(row){ %>
+            <tr>
+              <td class="id"><%= row.id %></td>
+              <td class="fullname"><%= row.fullName %></td>
+              <td><%= row.email %></td>
+              <td><%= row.mobile %></td>
+              <td><%= row.city %></td>
+              <td>
+                <button class="btn btn-info">
+                  <i class="fa fa-edit edit-btn" r_id=<%= row.id %>
+                    r_name=<%= row.fullName %> r_email=<%= row.email %> r_mobile=<%= row.mobile %>
+                    r_city=<%= row.city %>></i><i class="fa fa-save d-none save_icon"></i></button></td>
+              <td><button class="btn btn-danger">
+                <i class="fa fa-trash delete-btn" r_id=<%= row.id %> r_name=<%= row.fullName %>
+                  r_email=<%= row.email %> r_mobile=<%= row.mobile %> r_city=<%= row.city %> ></i></button></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+
+
+      </div>
+      <div class="tab-pane container fade" id="edit">
+        <h1>Edit contet</h1>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    //delete employee
+    $(".delete-btn").each(function(){
+      $(this).click(function(){
+        var id = $(this).attr('r_id');
+        var parent = this.parentElement.parentElement.parentElement;
+        $.ajax({
+          type : "POST",
+          url : '/delete',
+          data : {
+            id : id
+          },
+          beforeSend : function(){
+          parent.remove();
+          },
+          success : function(response){
+          if(response.key.trim()=='success')
+          {
+
+
+          }
+          alert(response.key);
+          } 
+
+        }); 
+      });
+    });
+
+
+
+    //edit employee
+      $(".edit-btn").each(function () {
+        $(this).click(function () {
+          $(this).addClass('d-none');
+          var id = $(this).attr('r_id');
+          var name = $(this).attr('r_name');
+          var email = $(this).attr('r_email');
+          var mobile = $(this).attr('r_mobile');
+          var city = $(this).attr('r_city');
+
+          var row = this.parentElement.parentElement.parentElement;
+          var td = row.getElementsByTagName("TD");
+          td[1].contentEditable = true;
+          td[1].focus();
+
+          td[2].contentEditable = true;
+          td[3].contentEditable = true;
+          td[4].contentEditable = true;
+          var save_icon = td[5].getElementsByClassName('save_icon')[0];
+          var edit_icon = td[5].getElementsByClassName('edit-btn')[0];
+          $(save_icon).removeClass('d-none');
+
+          save_icon.onclick = function () {
+            $.ajax({
+              type: "POST",
+              url: "/abc",
+              data:{
+                previous_id : id,
+                previous_name : name,
+                previous_email : email,
+                previous_mobile : mobile,
+                previous_city : city,
+                c_name : td[1].innerHTML,
+                c_email: td[2].innerHTML,
+                c_mobile: td[3].innerHTML,
+                c_city: td[4].innerHTML
+              },
+              beforeSend:function(){
+                console.log('pending')
+              },
+              success : function(response){
+                td[1].contentEditable = false;
+                td[2].contentEditable = false;
+                td[3].contentEditable = false;
+                td[4].contentEditable = false;
+                $(save_icon).addClass('d-none');
+                $(edit_icon).removeClass('d-none');
+              }
+            });
+          }
+        });
+      });
+
+      $()
+
+
+
+
+
+
+
+
+
+  </script>
+
+
+
+
+
+
+
+
+</body>
+
+</html>
